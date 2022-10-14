@@ -1,0 +1,88 @@
+﻿@model FileSearcher.Models.FileViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Files Searcher</h1>
+</div>
+<div class="d-flex justify-content-center" id="loadingDisplay">
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+<div id="tableDisplay" style="visibility: hidden;">
+    <table class="table table-striped" id="filesTable">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.Files[0].Title)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.Files[0].Tags)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.Files[0].Duration)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.Files[0].LastAccessDateTime)
+                </th>
+                <th>...</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Files)
+            {
+                <tr>
+                    <th scope="row" class="text-ellipsis" style="max-width: 20px">@item.IdString.Substring(item.IdString.Length - 5, 5)</th>
+                    <td class="text-ellipsis" style="max-width: 150px">
+                        @item.Title
+                    </td>
+                    <td class="text-ellipsis" style="max-width: 125px">
+                        @string.Join(',',item.Tags)
+                    </td>
+                    <td class="text-ellipsis" style="max-width: 50px">
+                        @item.Duration
+                    </td>
+                    <td class="text-ellipsis" style="max-width: 50px">
+                        @item.LastAccessDateTime
+                    </td>
+                    <td>
+                        <a class="copyToClipboard" address="@item.Source" style="cursor: pointer;" trigger="focus" data-toggle="tooltip" title="Coppied!">Copy</a> |
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var table = $('#filesTable').DataTable({
+                "pageLength": 15,
+                "lengthChange": false,
+            });
+            $("#loadingDisplay").hide();
+            $("#loadingDisplay").css("visibility", "hidden");
+            $("#tableDisplay").show();
+            $("#tableDisplay").css("visibility", "visible");
+        });
+        $('.copyToClipboard').click(function () {
+            let str = $(this).attr('address');
+            const el = document.createElement('textarea');
+            el.value = str;
+            el.setAttribute('readonly', '');
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            $(this).tooltip('show');
+        })
+    </script>
+}
